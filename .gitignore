@@ -1,0 +1,6 @@
+# clojure
+.cpcache
+.nrepl-port
+
+# treemacs
+.projectile
