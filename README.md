@@ -4,20 +4,20 @@ This is a Clojure translation of the Go code for the labs of the Spring 2020 off
 
 Translation progress:
 
-- [ ] Lab 1
-- [x] Lab 2
+- [x] [Lab 1](map-reduce)
+- [x] [Lab 2](raft)
 - [ ] Lab 3
 - [ ] Lab 4
 
 ## Tests
 
-Tests for the translated labs are in the `test` folder.
-
-The tests can be run by executing
+Run the tests for each lab by executing
 
 ```shell
 $ make test
 ```
+
+in the appropriate folder.
 
 ## License
 

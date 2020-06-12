@@ -1,0 +1,8 @@
+{:deps    {com.taoensso/timbre   {:mvn/version "4.10.0"}
+           go/go                 {:local/root "../go"}
+           org.clojure/clojure   {:mvn/version "1.10.1"}
+           org.clojure/data.json {:mvn/version "1.0.0"}
+           org.clojure/tools.cli {:mvn/version "1.0.194"}}
+ :aliases {:test {:extra-paths ["test"]
+                  :extra-deps  {lambdaisland/kaocha {:mvn/version "1.0.632"}}
+                  :main-opts   ["-m" "kaocha.runner"]}}}
