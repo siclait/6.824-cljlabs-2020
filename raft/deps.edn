@@ -1,0 +1,9 @@
+{:deps    {com.taoensso/timbre    {:mvn/version "4.10.0"}
+           crypto-random          {:mvn/version "1.2.0"}
+           go/go                  {:local/root "../go"}
+           lab-rpc/lab-rpc        {:local/root "../lab-rpc"}
+           org.clojure/clojure    {:mvn/version "1.10.1"}
+           org.clojure/core.async {:mvn/version "0.6.532"}}
+ :aliases {:test {:extra-paths ["test"]
+                  :extra-deps  {lambdaisland/kaocha {:mvn/version "1.0.632"}}
+                  :main-opts   ["-m" "kaocha.runner"]}}}
