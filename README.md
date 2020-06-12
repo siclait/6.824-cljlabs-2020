@@ -9,4 +9,12 @@ Translation progress:
 - [ ] Lab 3
 - [ ] Lab 4
 
+## Tests
+
 Tests for the translated labs are in the `test` folder.
+
+The tests can be run by executing
+
+```shell
+$ make test
+```

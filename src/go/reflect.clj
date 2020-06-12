@@ -1,7 +1,7 @@
 (ns go.reflect
   (:refer-clojure :exclude [methods name type])
   (:require
-   [clojure.set :as set]
+   [clojure.set]
    [clojure.string :as string]))
 
 (defrecord Empty [])
@@ -17,6 +17,7 @@
   (func [_]
     (fn [arg]
       (.invoke meth o (into-array Object [arg]))))
+
   Nameable
   (name [_]
     (.getName meth)))
@@ -26,35 +27,41 @@
   (methods [this])
   (method [this idx]))
 
-(defn declared-methods [c]
+(defn declared-methods
+  [c]
   (.getDeclaredMethods c))
 
-(defn method-name [m]
+(defn method-name
+  [m]
   (.getName m))
 
 (defrecord Type [o]
   IType
   (num-method [this]
     (count (methods this)))
+
   (methods [_]
     (let [method-set (fn [c]
-                       (into #{} (map method-name (declared-methods c))))]
-      (into []
-            (set/difference
-              (method-set (class o))
-              (method-set Empty)))))
+                       (into #{} (map method-name) (declared-methods c)))]
+      (vec
+        (clojure.set/difference
+          (method-set (class o))
+          (method-set Empty)))))
+
   (method [this idx]
-    (let [method-name (nth (methods this) idx)]
-      (->> (declared-methods (class o))
-           (filter #(= (.getName %) method-name))
-           (first)
-           (->Method o))))
+    (let [method-name       (nth (methods this) idx)
+          methods-with-name (->> (declared-methods (class o))
+                                 (filter #(= (.getName %) method-name)))
+          matching-method   (first methods-with-name)]
+      (->Method o matching-method)))
+
   Nameable
   (name [_]
     (-> (class o)
-        (.getName)
+        .getName
         (string/split #"\.")
-        (last))))
+        last)))
 
-(defn type-of [o]
+(defn type-of
+  [o]
   (->Type o))
