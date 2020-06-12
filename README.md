@@ -18,3 +18,7 @@ The tests can be run by executing
 ```shell
 $ make test
 ```
+
+## License
+
+[MIT License](LICENSE)
