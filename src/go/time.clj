@@ -1,5 +1,5 @@
 (ns go.time
-  (:require [clojure.core.async :as a]))
+  (:require [clojure.core.async :as async]))
 
 (defprotocol ITimer
   (stop [this]))
@@ -7,7 +7,7 @@
 (defrecord Timer [done-ch]
   ITimer
   (stop [_]
-    (a/close! done-ch)))
+    (async/close! done-ch)))
 
 (defn timer
   [done-ch]
@@ -15,11 +15,11 @@
 
 (defn after-func
   [ms f]
-  (let [done-ch (a/chan)]
-    (a/thread
-      (let [result (a/alt!!
+  (let [done-ch (async/chan)]
+    (async/thread
+      (let [result (async/alt!!
                      done-ch nil
-                     (a/timeout ms) :timeout)]
+                     (async/timeout ms) :timeout)]
         (when (some? result)
           (f))))
     (timer done-ch)))

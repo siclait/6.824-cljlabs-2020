@@ -1,6 +1,6 @@
 (ns raft.core-test
   "A translation of the tests for MIT's 6.824 Lab 2 from Go."
-  (:require [clojure.core.async :as a]
+  (:require [clojure.core.async :as async]
             [clojure.set :as set]
             [clojure.test :refer [deftest is]]
             [go.core :refer [defer]]
@@ -197,19 +197,19 @@
                                        (recur (inc try))
                                        (let [iters 5
                                              wg    (sync/wait-group)
-                                             is-ch (a/chan iters)]
+                                             is-ch (async/chan iters)]
                                          (dotimes [i iters]
                                            (sync/add wg 1)
-                                           (a/thread
+                                           (async/thread
                                              (let [[i term1 ok] (-> (get @(:rafts cfg) leader)
                                                                     (raft/start (+ 100 i)))]
                                                (when (and (= term1 term)
                                                           ok)
-                                                 (a/put! is-ch i))
+                                                 (async/put! is-ch i))
                                                (sync/done wg))))
 
                                          (sync/wait! wg)
-                                         (a/close! is-ch)
+                                         (async/close! is-ch)
 
                                          (let [result (reduce (fn [_ j]
                                                                 (let [[t _] (-> (get @(:rafts cfg) j)
@@ -221,7 +221,7 @@
                                            (if (= :continue result)
                                              :continue
                                              (let [[cmds failed] (loop [cmds [] failed false]
-                                                                   (let [index (a/<!! is-ch)]
+                                                                   (let [index (async/<!! is-ch)]
                                                                      (if index
                                                                        (let [cmd (config/wait cfg index servers term)]
                                                                          (cond
@@ -639,7 +639,7 @@
         (doseq [iters (range 1 50)]
           (dotimes [j 4]
             (sync/add wg 1)
-            (a/thread
+            (async/thread
               (defer (sync/done wg)
                 (config/one cfg (+ (* 100 iters) j) 1 true))))
           (config/one cfg iters 1 true))
@@ -717,7 +717,7 @@
       (let [stop (atom 0)
             cfn  (fn [me ch]
                    (let [values (atom [])]
-                     (defer (a/put! ch @values)
+                     (defer (async/put! ch @values)
                        (while (zero? @stop)
                          (let [x          (rand-big-int)
                                [index ok] (loop [index -1 ok false i 0]
@@ -745,8 +745,8 @@
                              (Thread/sleep (* 79 me 17))))))))
             ncli 3
             cha  (doall (for [i (range ncli)]
-                          (let [ch (a/chan)]
-                            (a/thread
+                          (let [ch (async/chan)]
+                            (async/thread
                               (cfn i ch))
                             ch)))]
         (dotimes [_ 20]
@@ -784,7 +784,7 @@
 
         (let [values     (loop [i 0 values []]
                            (if (< i ncli)
-                             (let [vs (a/<!! (nth cha i))]
+                             (let [vs (async/<!! (nth cha i))]
                                (is (some? vs) "client failed")
                                (recur (inc i) (apply conj values vs)))
                              values))

@@ -1,6 +1,6 @@
 (ns raft.config
   "Support for Raft tester."
-  (:require [clojure.core.async :as a]
+  (:require [clojure.core.async :as async]
             [clojure.string :as string]
             [clojure.test :as test]
             [crypto.random :as crand]
@@ -93,10 +93,10 @@
           (swap! saved assoc i (persister/copy saved-persister))
           (swap! saved assoc i (persister/make-persister))))
       ;; listen to messages from Raft indicating newly committed messages.
-      (let [apply-ch (a/chan)]
-        (a/thread
+      (let [apply-ch (async/chan)]
+        (async/thread
           (loop []
-            (let [m       (a/<!! apply-ch)
+            (let [m       (async/<!! apply-ch)
                   err-msg (atom "")]
               (when (:command-valid m)
                 (let [v (:command m)]
